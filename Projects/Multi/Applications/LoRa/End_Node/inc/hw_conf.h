@@ -133,9 +133,9 @@ Maintainer: Miguel Luis and Gregory Cristian
 //#define LOW_POWER_DISABLE
 
 /* debug swicthes in bsp.c */
-#define SENSOR_ENABLED
-#define X_NUCLEO_IKS01A1
-   
+//#define SENSOR_ENABLED
+//#define X_NUCLEO_IKS01A1
+#define X_NUCLEO_NFC01A1
    
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/

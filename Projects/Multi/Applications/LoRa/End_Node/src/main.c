@@ -121,7 +121,10 @@ static void LoraTxData( lora_AppData_t *AppData, FunctionalState* IsTxConfirmed)
 static void LoraRxData( lora_AppData_t *AppData);
 
 /* Private variables ---------------------------------------------------------*/
-/* load call backs*/
+sTextInfo textInfo;
+char* tokens[8];
+
+/* load Main call backs structure*/
 static LoRaMainCallback_t LoRaMainCallbacks ={ HW_GetBatteryLevel,
                                                HW_GetUniqueId,
                                                HW_GetRandomSeed,
@@ -243,6 +246,17 @@ int main( void )
   LED_On(LED_GREEN);
   HAL_Delay(50);
   LED_Off(LED_GREEN);
+  // Init of the Type Tag 4 component (M24SR)
+  // Thanks to a call to KillSession command during init no issue can occurs
+  // If customer modify the code to avoid Kill session command call,
+  // he must retry Init until succes (session can be lock by RF )
+  while (TT4_Init() != SUCCESS);
+
+  TT4_ReadText(&textInfo);
+
+  PRINTF("NFC: %s\n\r", textInfo.Message);
+
+
   /* Configure the Lora Stack*/
   lora_Init( &LoRaMainCallbacks, &LoRaParamInit);
   
@@ -432,4 +446,117 @@ static void OnTimerLedEvent( void )
   LED_Off( LED_RED1 ) ; 
 }
 #endif
+
+void M24SR_I2CInit ( void )
+{
+	/* check if we re-init after a detected issue */
+	if( hi2c1.Instance == M24SR_I2C)
+	  HAL_I2C_DeInit(&hi2c1);
+
+  /* Configure I2C structure */
+  hi2c1.Instance 	     = M24SR_I2C;
+  hi2c1.Init.AddressingMode  = I2C_ADDRESSINGMODE_7BIT;
+#if defined (STM32F302x8)
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode   = I2C_NOSTRETCH_DISABLE;
+#elif defined (STM32F401xE)
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLED;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLED;
+  hi2c1.Init.NoStretchMode   = I2C_NOSTRETCH_DISABLED;
+#endif
+  hi2c1.Init.OwnAddress1     = 0;
+  hi2c1.Init.OwnAddress2     = 0;
+#if (defined USE_STM32F4XX_NUCLEO) || (defined USE_STM32L1XX_NUCLEO) || \
+	  (defined USE_STM32F1XX_NUCLEO)
+  hi2c1.Init.ClockSpeed      = M24SR_I2C_SPEED;
+  hi2c1.Init.DutyCycle       = I2C_DUTYCYCLE_2;
+#elif (defined USE_STM32F0XX_NUCLEO) || (defined USE_STM32L0XX_NUCLEO) || (defined USE_B_L072Z_LRWAN1) || \
+      (defined USE_STM32F3XX_NUCLEO) || (defined USE_STM32L4XX_NUCLEO)
+  hi2c1.Init.Timing          = M24SR_I2C_SPEED;
+#endif
+
+	if(HAL_I2C_Init(&hi2c1) != HAL_OK)
+  {
+    /* Initialization Error */
+    Error_Handler();
+  }
+
+}
+
+void M24SR_GPOInit ( void )
+{
+  GPIO_InitTypeDef GPIO_InitStruct;
+
+  /* GPIO Ports Clock Enable */
+  INIT_CLK_GPO_RFD();
+
+  /* Configure GPIO pins for GPO (PA6)*/
+#ifndef I2C_GPO_INTERRUPT_ALLOWED
+  GPIO_InitStruct.Pin = M24SR_GPO_PIN;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+  HAL_GPIO_Init(M24SR_GPO_PIN_PORT, &GPIO_InitStruct);
+#else
+  GPIO_InitStruct.Pin = M24SR_GPO_PIN;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+
+  HAL_GPIO_Init(M24SR_GPO_PIN_PORT, &GPIO_InitStruct);
+  /* Enable and set EXTI9_5 Interrupt to the lowest priority */
+#if (defined USE_STM32F4XX_NUCLEO) || (defined USE_STM32F3XX_NUCLEO) || \
+     (defined USE_STM32L1XX_NUCLEO) || (defined USE_STM32F1XX_NUCLEO) || (defined USE_STM32L4XX_NUCLEO)
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 3, 0);
+  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+#elif (defined USE_STM32L0XX_NUCLEO) || (defined USE_B_L072Z_LRWAN1) || (defined USE_STM32F0XX_NUCLEO)
+  HAL_NVIC_SetPriority(EXTI4_15_IRQn, 3, 0);
+  HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
+#endif
+
+#endif
+
+  /* Configure GPIO pins for DISABLE (PA7)*/
+  GPIO_InitStruct.Pin = M24SR_RFDIS_PIN;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(M24SR_RFDIS_PIN_PORT, &GPIO_InitStruct);
+}
+
+/**
+  * @brief  This function wait the time given in param (in milisecond)
+	* @param	time_ms: time value in milisecond
+  */
+void M24SR_WaitMs(uint32_t time_ms)
+{
+	wait_ms(time_ms);
+}
+
+/**
+  * @brief  This function retrieve current tick
+  * @param	ptickstart: pointer on a variable to store current tick value
+  */
+void M24SR_GetTick( uint32_t *ptickstart )
+{
+	*ptickstart = HAL_GetTick();
+}
+/**
+  * @brief  This function read the state of the M24SR GPO
+	* @param	none
+  * @retval GPIO_PinState : state of the M24SR GPO
+  */
+void M24SR_GPO_ReadPin( GPIO_PinState * pPinState)
+{
+	*pPinState = HAL_GPIO_ReadPin(M24SR_GPO_PIN_PORT,M24SR_GPO_PIN);
+}
+
+/**
+  * @brief  This function set the state of the M24SR RF disable pin
+	* @param	PinState: put RF disable pin of M24SR in PinState (1 or 0)
+  */
+void M24SR_RFDIS_WritePin( GPIO_PinState PinState)
+{
+	HAL_GPIO_WritePin(M24SR_RFDIS_PIN_PORT,M24SR_RFDIS_PIN,PinState);
+}
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
