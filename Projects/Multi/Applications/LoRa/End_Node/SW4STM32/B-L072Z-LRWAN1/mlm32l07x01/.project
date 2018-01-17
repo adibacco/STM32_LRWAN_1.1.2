@@ -156,6 +156,11 @@
 			<locationURI>PARENT-3-PROJECT_LOC/src/hw_spi.c</locationURI>
 		</link>
 		<link>
+			<name>Projects/End_Node/hw_i2c.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/src/hw_i2c.c</locationURI>
+		</link>
+		<link>
 			<name>Projects/End_Node/main.c</name>
 			<type>1</type>
 			<locationURI>PARENT-3-PROJECT_LOC/src/main.c</locationURI>
@@ -369,6 +374,81 @@
 			<name>Middlewares/Lora/Mac/Regions/RegionUS915.c</name>
 			<type>1</type>
 			<locationURI>PARENT-8-PROJECT_LOC/Middlewares/Third_Party/Lora/Mac/region/RegionUS915.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/lib_NDEF/lib_ISO7816_Password.c</name>
+			<type>1</type>
+			<locationURI>PARENT-8-PROJECT_LOC/Middlewares/ST/lib_NDEF/src/lib_ISO7816_Password.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/lib_NDEF/lib_NDEF.c</name>
+			<type>1</type>
+			<locationURI>PARENT-8-PROJECT_LOC/Middlewares/ST/lib_NDEF/src/lib_NDEF.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/lib_NDEF/lib_NDEF_AAR.c</name>
+			<type>1</type>
+			<locationURI>PARENT-8-PROJECT_LOC/Middlewares/ST/lib_NDEF/src/lib_NDEF_AAR.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/lib_NDEF/lib_NDEF_Email.c</name>
+			<type>1</type>
+			<locationURI>PARENT-8-PROJECT_LOC/Middlewares/ST/lib_NDEF/src/lib_NDEF_Email.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/lib_NDEF/lib_NDEF_Geo.c</name>
+			<type>1</type>
+			<locationURI>PARENT-8-PROJECT_LOC/Middlewares/ST/lib_NDEF/src/lib_NDEF_Geo.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/lib_NDEF/lib_NDEF_MyApp.c</name>
+			<type>1</type>
+			<locationURI>PARENT-8-PROJECT_LOC/Middlewares/ST/lib_NDEF/src/lib_NDEF_MyApp.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/lib_NDEF/lib_NDEF_SMS.c</name>
+			<type>1</type>
+			<locationURI>PARENT-8-PROJECT_LOC/Middlewares/ST/lib_NDEF/src/lib_NDEF_SMS.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/lib_NDEF/lib_NDEF_Text.c</name>
+			<type>1</type>
+			<locationURI>PARENT-8-PROJECT_LOC/Middlewares/ST/lib_NDEF/src/lib_NDEF_Text.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/lib_NDEF/lib_NDEF_URI.c</name>
+			<type>1</type>
+			<locationURI>PARENT-8-PROJECT_LOC/Middlewares/ST/lib_NDEF/src/lib_NDEF_URI.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/lib_NDEF/lib_NDEF_Vcard.c</name>
+			<type>1</type>
+			<locationURI>PARENT-8-PROJECT_LOC/Middlewares/ST/lib_NDEF/src/lib_NDEF_Vcard.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/lib_NDEF/lib_STProprietary_feature.c</name>
+			<type>1</type>
+			<locationURI>PARENT-8-PROJECT_LOC/Middlewares/ST/lib_NDEF/src/lib_STProprietary_feature.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/lib_NDEF/lib_TagType4.c</name>
+			<type>1</type>
+			<locationURI>PARENT-8-PROJECT_LOC/Middlewares/ST/lib_NDEF/src/lib_TagType4.c</locationURI>
+		</link>
+		<link>
+			<name>Drivers/BSP/Components/lib_M24SR.c</name>
+			<type>1</type>
+			<locationURI>PARENT-8-PROJECT_LOC/Drivers/BSP/Components/M24SR/lib_M24SR.c</locationURI>
+		</link>
+		<link>
+			<name>Drivers/BSP/Components/m24sr.c</name>
+			<type>1</type>
+			<locationURI>PARENT-8-PROJECT_LOC/Drivers/BSP/Components/M24SR/m24sr.c</locationURI>
+		</link>
+		<link>
+			<name>Drivers/BSP/X-NUCLEO-NFC01A1/drv_I2C_M24SR.c</name>
+			<type>1</type>
+			<locationURI>PARENT-8-PROJECT_LOC/Drivers/BSP/X-NUCLEO-NFC01A1/drv_I2C_M24SR.c</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

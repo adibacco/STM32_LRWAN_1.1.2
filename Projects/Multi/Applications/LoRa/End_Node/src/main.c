@@ -66,11 +66,16 @@ Maintainer: Miguel Luis, Gregory Cristian and Wael Guibene
 #include "timeServer.h"
 #include "vcom.h"
 #include "version.h"
+#include "main.h"
+#include "drv_I2C_M24SR.h"
 #include <time.h>
 #include <stdlib.h>
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
+extern I2C_HandleTypeDef hi2c1;
+extern uint8_t DevEui[];
+extern uint8_t AppKey[];
 /*!
  * CAYENNE_LPP is myDevices Application server.
  */
@@ -148,6 +153,70 @@ static  LoRaParam_t LoRaParamInit= {TX_ON_TIMER,
                                     JOINREQ_NBTRIALS};
 
 /* Private functions ---------------------------------------------------------*/
+void parseNfcInfo(char* str, char** tokens) {
+
+	   const char s[2] = ";";
+	   int i = 0;
+	   char* token;
+
+	   /* get the first token */
+	   token = tokens[i++] = strtok(str, s);
+
+	   /* walk through other tokens */
+	   while( token != NULL ) {
+		  token = tokens[i++] = strtok(NULL, s);
+	   }
+
+}
+
+void scanEui(const char* str, uint8_t* data) {
+
+#define EUI_LEN		8
+
+	int values[EUI_LEN];
+	int i;
+
+
+	if( EUI_LEN == sscanf( str, "Eui: %x:%x:%x:%x:%x:%x:%x:%x%*c",
+		&values[0], &values[1], &values[2], &values[3],
+		&values[4], &values[5], &values[6], &values[7]
+		) )
+	{
+		/* convert to uint8_t */
+		for( i = 0; i < EUI_LEN; ++i )
+			data[i] = (uint8_t) values[i];
+	}
+	else
+	{
+		PRINTF("EUI is invalid\n\r");
+	}
+}
+
+
+void scanAppKey(const char* str, uint8_t* data) {
+
+#define APPKEY_LEN		16
+
+	int values[APPKEY_LEN];
+	int i;
+
+
+	if( APPKEY_LEN == sscanf( str, "AppKey: %x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x%*c",
+		&values[0], &values[1], &values[2], &values[3],
+		&values[4], &values[5], &values[6], &values[7],
+		&values[8], &values[9], &values[10], &values[11],
+		&values[12], &values[13], &values[14], &values[15]
+		) )
+	{
+		/* convert to uint8_t */
+		for( i = 0; i < APPKEY_LEN; ++i )
+			data[i] = (uint8_t) values[i];
+	}
+	else
+	{
+		PRINTF("APPKEY is invalid\n\r");
+	}
+}
 
 /**
   * @brief  Main program
@@ -171,6 +240,9 @@ int main( void )
   /* USER CODE BEGIN 1 */
   /* USER CODE END 1 */
   
+  LED_On(LED_GREEN);
+  HAL_Delay(50);
+  LED_Off(LED_GREEN);
   /* Configure the Lora Stack*/
   lora_Init( &LoRaMainCallbacks, &LoRaParamInit);
   

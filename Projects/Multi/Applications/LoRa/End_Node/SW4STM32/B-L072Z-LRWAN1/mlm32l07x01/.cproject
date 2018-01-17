@@ -52,6 +52,9 @@
 									<listOptionValue builtIn="false" value="../../../../../../../../../Drivers/BSP/X_NUCLEO_IKS01A2"/>
 									<listOptionValue builtIn="false" value="../../../../../../../../../Drivers/BSP/B-L072Z-LRWAN1"/>
 									<listOptionValue builtIn="false" value="../../../../../../../../../Middlewares/Third_Party/Lora/Mac/region"/>
+									<listOptionValue builtIn="false" value="../../../../../../../../../Drivers/BSP/Components/M24SR"/>
+									<listOptionValue builtIn="false" value="../../../../../../../../../Drivers/BSP/X-NUCLEO-NFC01A1"/>
+									<listOptionValue builtIn="false" value="../../../../../../../../../Middlewares/ST/lib_NDEF/inc"/>
 								</option>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1636441418" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="STM32L072xx"/>
