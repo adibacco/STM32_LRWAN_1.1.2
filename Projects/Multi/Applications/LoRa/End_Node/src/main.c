@@ -122,7 +122,7 @@ static void LoraRxData( lora_AppData_t *AppData);
 
 /* Private variables ---------------------------------------------------------*/
 sTextInfo textInfo;
-char* tokens[8];
+char* tokens[16];
 
 /* load Main call backs structure*/
 static LoRaMainCallback_t LoRaMainCallbacks ={ HW_GetBatteryLevel,
@@ -172,7 +172,7 @@ void parseNfcInfo(char* str, char** tokens) {
 
 }
 
-void scanEui(const char* str, uint8_t* data) {
+void getDevEui(const char* str, uint8_t* data) {
 
 #define EUI_LEN		8
 
@@ -180,7 +180,7 @@ void scanEui(const char* str, uint8_t* data) {
 	int i;
 
 
-	if( EUI_LEN == sscanf( str, "Eui: %x:%x:%x:%x:%x:%x:%x:%x%*c",
+	if( EUI_LEN == sscanf( str, "%x:%x:%x:%x:%x:%x:%x:%x%*c",
 		&values[0], &values[1], &values[2], &values[3],
 		&values[4], &values[5], &values[6], &values[7]
 		) )
@@ -196,7 +196,7 @@ void scanEui(const char* str, uint8_t* data) {
 }
 
 
-void scanAppKey(const char* str, uint8_t* data) {
+void getAppKey(const char* str, uint8_t* data) {
 
 #define APPKEY_LEN		16
 
@@ -204,7 +204,7 @@ void scanAppKey(const char* str, uint8_t* data) {
 	int i;
 
 
-	if( APPKEY_LEN == sscanf( str, "AppKey: %x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x%*c",
+	if( APPKEY_LEN == sscanf( str, "%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x%*c",
 		&values[0], &values[1], &values[2], &values[3],
 		&values[4], &values[5], &values[6], &values[7],
 		&values[8], &values[9], &values[10], &values[11],
@@ -246,16 +246,24 @@ int main( void )
   LED_On(LED_GREEN);
   HAL_Delay(50);
   LED_Off(LED_GREEN);
+
+#if defined (X_NUCLEO_NFC01A1)
   // Init of the Type Tag 4 component (M24SR)
   // Thanks to a call to KillSession command during init no issue can occurs
   // If customer modify the code to avoid Kill session command call,
-  // he must retry Init until succes (session can be lock by RF )
+  // he must retry Init until success (session can be lock by RF )
   while (TT4_Init() != SUCCESS);
 
   TT4_ReadText(&textInfo);
 
+  parseNfcInfo(&textInfo.Message, tokens);
+
+  getDevEui(tokens[1], DevEui);
+  getAppKey(tokens[2], AppKey);
+
   PRINTF("NFC: %s\n\r", textInfo.Message);
 
+#endif
 
   /* Configure the Lora Stack*/
   lora_Init( &LoRaMainCallbacks, &LoRaParamInit);
@@ -388,7 +396,11 @@ static void LoraTxData( lora_AppData_t *AppData, FunctionalState* IsTxConfirmed)
 #endif  /* REGION_XX915 */
 #endif  /* CAYENNE_LPP */
 	// sending raw data in TEXT format (not good for security)
+#if defined (X_NUCLEO_NFC01A1)
+  AppData->BuffSize = sprintf((char *) AppData->Buff, "%s,%s,%s,%d", tokens[0], tokens[3], tokens[4], batteryLevel);
+#else
   AppData->BuffSize = sprintf((char *) AppData->Buff, "%f,%f,%f,%d", sensor_data.temperature, sensor_data.pressure, sensor_data.humidity, batteryLevel);
+#endif
   /* USER CODE END 3 */
 }
 
